@@ -1,0 +1,1 @@
+<?php session_start(); include 'db.php'; $e=$_POST['email']; $p=$_POST['password']; $r=$conn->query("SELECT * FROM users WHERE email='$e' AND password='$p'"); if($r->num_rows>0){ $_SESSION['email']=$e; header("Location: dashboard.php"); }else{ header("Location: index.php?error=Wrong Password"); } ?>
