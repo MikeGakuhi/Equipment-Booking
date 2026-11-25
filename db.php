@@ -1,1 +1,1 @@
-<?php $conn=new mysqli("localhost","root","","uni_system"); ?>
+<?php $conn = new mysqli("localhost", "root", "", "uni_system");

@@ -1,7 +1,361 @@
-<?php session_start(); if(!isset($_SESSION['email'])){ header("Location: index.php"); exit(); } include 'db.php'; $email=$_SESSION['email']; $user=$conn->query("SELECT * FROM users WHERE email='$email'")->fetch_assoc(); $total=$conn->query("SELECT COUNT(*) as c FROM bookings WHERE email='$email'")->fetch_assoc()['c']; $pending=$conn->query("SELECT COUNT(*) as c FROM bookings WHERE email='$email' AND status='Pending'")->fetch_assoc()['c']; $approved=$conn->query("SELECT COUNT(*) as c FROM bookings WHERE email='$email' AND status='Approved'")->fetch_assoc()['c']; $rejected=$conn->query("SELECT COUNT(*) as c FROM bookings WHERE email='$email' AND status='Rejected'")->fetch_assoc()['c']; ?>
-<!DOCTYPE html><html><head><title>Dashboard - United States International University</title><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',Arial;background:radial-gradient(circle at 10% 20%, rgba(10,25,49,.06) 0%, transparent 40%),radial-gradient(circle at 90% 80%, rgba(212,175,55,.12) 0%, transparent 40%),linear-gradient(180deg,#f8f9ff 0%,#eef1f8 100%);min-height:100vh;color:#222}.nav{background:#0a1931;color:white;padding:14px 25px;display:flex;justify-content:space-between;border-bottom:4px solid #d4af37}.nav a{color:white;margin-left:18px;text-decoration:none;font-size:11px;font-weight:700;text-transform:uppercase}.container{max-width:1150px;margin:22px auto;padding:0 20px;display:grid;grid-template-columns:2fr 1fr;gap:18px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:0;grid-column:1/-1}.stat{background:white;padding:18px;border-radius:12px;text-align:center;box-shadow:0 4px 15px rgba(10,25,49,.07);border-left:4px solid #0a1931}.stat h1{font-size:26px;color:#0a1931}.stat p{font-size:9px;font-weight:800;color:#666;text-transform:uppercase}.card{background:rgba(255,255,255,.92);border-radius:12px;padding:22px;box-shadow:0 4px 20px rgba(10,25,49,.06);margin-bottom:18px;border-top:3px solid #0a1931}.card h2{font-size:13px;color:#0a1931;text-transform:uppercase;border-left:4px solid #d4af37;padding-left:10px;margin-bottom:14px}table{width:100%;border-collapse:collapse}th{background:#0a1931;color:white;padding:9px 10px;font-size:9px;text-transform:uppercase;text-align:left}td{padding:10px;border-bottom:1px solid #eef1f8;font-size:11px}.badge{padding:4px 9px;border-radius:20px;font-size:9px;font-weight:800;text-transform:uppercase}.Pending{background:#fff3cd;color:#856404}.Approved{background:#d4edda;color:#155724}.Rejected{background:#f8d7da;color:#721c24}.btn{display:inline-block;background:#0a1931;color:white;padding:9px 16px;border-radius:6px;text-decoration:none;font-size:11px;font-weight:700;text-transform:uppercase}.alert{padding:10px;border-radius:8px;margin-bottom:12px;font-size:11px;font-weight:700}</style></head><body>
-<div class="nav"><div><b>UNITED STATES INTERNATIONAL UNIVERSITY - AFRICA</b> <span style="color:#d4af37">| LABORATORY PORTAL</span></div><div><a href="dashboard.php">Dashboard</a><a href="book.php">Book</a><a href="mybookings.php">My Bookings</a><a href="logout.php">Logout</a></div></div>
-<div style="max-width:1150px;margin:20px auto;padding:0 20px">
-<?php if($approved>0){ echo "<div class='alert' style='background:#d4edda;color:#155724;border:1px solid #a3d9b1'>✅ $approved request APPROVED - Collect at Block C</div>"; } if($rejected>0){ echo "<div class='alert' style='background:#f8d7da;color:#721c24'>❌ $rejected request REJECTED - Visit Admin</div>"; } ?>
-<div class="stats"><div class="stat"><h1><?php echo $total; ?></h1><p>Total</p></div><div class="stat"><h1><?php echo $pending; ?></h1><p>Pending</p></div><div class="stat"><h1><?php echo $approved; ?></h1><p>Approved</p></div><div class="stat" style="border-left-color:#dc3545"><h1><?php echo $rejected; ?></h1><p>Rejected</p></div></div></div>
-<div class="container"><div><div class="card" style="background:linear-gradient(135deg,#0a1931 0%,#1a3a5f 100%);color:white"><h2 style="color:white;border-left-color:#d4af37">Welcome, <?php echo $user['name']; ?> — School of Science and Technology</h2><p style="font-size:12px;line-height:1.7;color:#c0cfe8"><b style="color:#d4af37">Email:</b> <?php echo $email; ?> | <b style="color:#d4af37">Status:</b> Active Student<br><br>Welcome to Laboratory Portal for United States International University - Africa.</p><div style="margin-top:14px"><a class="btn" style="background:#d4af37;color:#0a1931" href="book.php">+ Request Equipment</a><a class="btn" style="background:white;color:#0a1931;margin-left:8px" href="mybookings.php">Track (<?php echo $total; ?>)</a></div></div><div class="card"><h2>My Recent Requests - Live</h2><p style="font-size:10px;color:#888;margin-bottom:10px">Last updated: <?php echo date('H:i:s'); ?> - <a href="dashboard.php">Refresh</a></p><table><tr><th>Ref</th><th>Equipment</th><th>Date</th><th>Status</th></tr><?php $r=$conn->query("SELECT * FROM bookings WHERE email='$email' ORDER BY id DESC LIMIT 5"); while($row=$r->fetch_assoc()){ echo "<tr><td><b>#USIU00".$row['id']."</b></td><td>".$row['equipment']."</td><td>".$row['book_date']."</td><td><span class='badge ".$row['status']."'>".$row['status']."</span></td></tr>"; } ?></table></div></div><div><div class="card"><h2>Announcements</h2><div style="background:#fffbe6;border-left:4px solid #d4af37;padding:10px;border-radius:6px;margin-bottom:8px;font-size:11px"><b>Lab Hours</b><br>Mon-Sat 8AM-6PM</div></div><div class="card"><h2>Lab Regulations</h2><ul style="font-size:11px;color:#555;line-height:1.8;padding-left:15px"><li>Book 24hrs in advance</li><li>Max 3 equipment/week</li><li>Report damages</li></ul></div></div></div></body></html>
+<?php session_start();
+if (!isset($_SESSION['email'])) {
+  header("Location: index.php");
+  exit();
+}
+include 'db.php';
+
+$email = $_SESSION['email'];
+
+// Get real name from users table, show first name only - Mike, not mgnduati
+$row = $conn->query("SELECT name FROM users WHERE email='$email'")->fetch_assoc();
+$fullName = $row['name'] ?? 'Mike';
+$name = ucfirst(strtolower(explode(' ', trim($fullName))[0]));
+
+$total = $conn->query("SELECT COUNT(*) as c FROM bookings WHERE email='$email'")->fetch_assoc()['c'];
+$pending = $conn->query("SELECT COUNT(*) as c FROM bookings WHERE email='$email' AND status='Pending'")->fetch_assoc()['c'];
+$approved = $conn->query("SELECT COUNT(*) as c FROM bookings WHERE email='$email' AND status='Approved'")->fetch_assoc()['c'];
+?>
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Dashboard - USIU Equipment Booking System</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
+
+    body {
+      font-family: 'Segoe UI', Arial;
+      background: #fdf2f5;
+      color: #222;
+      display: flex;
+      min-height: 100vh
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 230px;
+      background: #1e1e1e;
+      color: white;
+      padding: 22px 18px;
+      flex-shrink: 0
+    }
+
+    .sidebar h1 {
+      font-size: 19px;
+      line-height: 1.2;
+      margin-bottom: 4px
+    }
+
+    .sidebar h1 span {
+      color: #d4af37
+    }
+
+    .sidebar p {
+      font-size: 11px;
+      color: #aaa;
+      margin-bottom: 28px
+    }
+
+    .sidebar a {
+      display: block;
+      color: #ddd;
+      text-decoration: none;
+      padding: 11px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 6px
+    }
+
+    .sidebar a.active,
+    .sidebar a:hover {
+      background: #333;
+      color: white
+    }
+
+    .sidebar .logout {
+      margin-top: 30px;
+      color: #ff9a9a
+    }
+
+    /* Main */
+    .main {
+      flex: 1;
+      padding: 22px 26px
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px
+    }
+
+    .topbar h2 {
+      font-size: 20px
+    }
+
+    .topbar span {
+      font-size: 12px;
+      color: #888
+    }
+
+    .banner {
+      background: #111;
+      color: white;
+      border-radius: 14px;
+      padding: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px
+    }
+
+    .banner h2 {
+      font-size: 22px;
+      margin-bottom: 6px
+    }
+
+    .banner p {
+      font-size: 13px;
+      color: #ccc;
+      line-height: 1.6
+    }
+
+    .btn {
+      display: inline-block;
+      background: white;
+      color: #111;
+      padding: 11px 18px;
+      border-radius: 20px;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 700
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 18px;
+      align-items: start
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      grid-column: 1/-1
+    }
+
+    .stat {
+      background: white;
+      padding: 18px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, .04)
+    }
+
+    .stat h1 {
+      font-size: 26px;
+      color: #111
+    }
+
+    .stat p {
+      font-size: 10px;
+      font-weight: 800;
+      color: #888;
+      text-transform: uppercase;
+      margin-top: 4px
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, .04);
+      margin-bottom: 18px
+    }
+
+    .card h2 {
+      font-size: 14px;
+      margin-bottom: 12px
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse
+    }
+
+    th {
+      text-align: left;
+      padding: 10px;
+      font-size: 11px;
+      color: #888;
+      border-bottom: 1px solid #eee;
+      text-transform: uppercase
+    }
+
+    td {
+      padding: 11px 10px;
+      border-bottom: 1px solid #f5f5f5;
+      font-size: 12px
+    }
+
+    .badge {
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase
+    }
+
+    .Pending {
+      background: #fff3cd;
+      color: #856404
+    }
+
+    .Approved {
+      background: #d4edda;
+      color: #155724
+    }
+
+    .Rejected {
+      background: #f8d7da;
+      color: #721c24
+    }
+
+    .info {
+      background: #fdf2f5;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      border-left: 3px solid #111;
+      font-size: 12px;
+      line-height: 1.6
+    }
+
+    ul {
+      font-size: 12px;
+      color: #555;
+      line-height: 1.9;
+      padding-left: 16px
+    }
+
+    @media(max-width:900px) {
+      body {
+        flex-direction: column
+      }
+
+      .sidebar {
+        width: 100%
+      }
+
+      .layout {
+        grid-template-columns: 1fr
+      }
+
+      .stats {
+        grid-template-columns: repeat(3, 1fr)
+      }
+
+      .banner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="sidebar">
+    <h1>USIU - AFRICA<br><span>EQUIPMENT BOOKING</span></h1>
+    <p>University Equipment Booking System</p>
+    <a href="dashboard.php" class="active">🏠 Dashboard</a>
+    <a href="book.php">📦 Book Equipment</a>
+    <a href="mybookings.php">📋 My Bookings</a>
+    <a href="logout.php" class="logout">↩ Logout</a>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <h2>Dashboard</h2><span>University Equipment Booking System</span>
+      </div>
+      <div style="text-align:right"><b><?php echo $name; ?></b><br><span><?php echo $email; ?></span></div>
+    </div>
+
+    <div class="layout">
+      <div>
+        <div class="banner">
+          <div>
+            <h2>Good morning, <?php echo $name; ?> 👋</h2>
+            <p>Welcome back to USIU Equipment Booking System.<br>You have <b style="color:#d4af37"><?php echo $pending; ?> pending request(s)</b>. Book equipment easily and track your requests here.</p>
+          </div>
+          <div>
+            <a class="btn" href="book.php">+ Book Equipment</a>
+          </div>
+        </div>
+
+        <div class="stats">
+          <div class="stat">
+            <h1><?php echo $total; ?></h1>
+            <p>My Bookings</p>
+          </div>
+          <div class="stat">
+            <h1><?php echo $pending; ?></h1>
+            <p>Pending</p>
+          </div>
+          <div class="stat">
+            <h1><?php echo $approved; ?></h1>
+            <p>Approved</p>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:18px">
+          <h2>My Recent Bookings</h2>
+          <table>
+            <tr>
+              <th>Ref</th>
+              <th>Equipment</th>
+              <th>Date</th>
+              <th>Status</th>
+            </tr>
+            <?php $r = $conn->query("SELECT * FROM bookings WHERE email='$email' ORDER BY id DESC LIMIT 5");
+            while ($row = $r->fetch_assoc()) {
+              echo "<tr><td><b>#USIU00" . $row['id'] . "</b></td><td>" . $row['equipment'] . "</td><td>" . $row['book_date'] . "</td><td><span class='badge " . $row['status'] . "'>" . $row['status'] . "</span></td></tr>";
+            } ?>
+          </table>
+        </div>
+      </div>
+
+      <div>
+        <div class="card">
+          <h2>Quick Info</h2>
+          <div class="info"><b>Most Requested:</b><br>Microscope Olympus CX23 (8x this week)</div>
+          <div class="info" style="border-left-color:#d4af37"><b>Notice:</b><br>Please return equipment on time to avoid penalties</div>
+          <div class="info" style="border-left-color:#28a745"><b>Returns Today:</b><br>2 equipment due for return</div>
+        </div>
+        <div class="card">
+          <h2>Available Equipment</h2>
+          <ul>
+            <li>Microscope - 8 units</li>
+            <li>Projector - 5 units</li>
+            <li>DSLR Camera - 4 units</li>
+            <li>Chemistry Kit - 12 units</li>
+            <li>Laptop - 10 units</li>
+            <li>Spectrophotometer - 2 units</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+
+</html>
